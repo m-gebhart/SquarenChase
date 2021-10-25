@@ -7,20 +7,30 @@ public class SnCSquare : MonoBehaviour
     [Header("Free Entry/Exit Sides")]
     [HideInInspector]
     public int squareDirection = 0; /*max = 3; 0 is default orientation; +1 = +90 degree rotate*/
-    public bool bLeft = false, bTop = false, bRight = false, bBottom = false;
+    public bool bLeft = false, bTop = false, bRight = false, bBottom = false; /* 0 = left, 1 = top, 2 = right, 3 = bottom; in accordance to x/z-axis*/
     public float verticalOffset = 0f, postVerticalOffset = 0f;
     [HideInInspector]
     public int exitSide = -1, entrySide = -1;
+
     [Header("Creation Animation")]
     public AnimationCurve creationYCurve;
     public float creationHeight, creationTime;
+
     [Header("Shake Animation")]
     public bool bShouldShake = true;
     bool bShakeCompleted = false;
     public float shakeTime, shakeRange, shakeIntensity;
+
     [Header("Removal Animation")]
     public AnimationCurve removalYCurve;
     public float removalHeight, removalTime;
+
+    [Header("Extras Spawn Locations")]
+    public List<GameObject> coinSpawnLocations;
+    public float coinSpawnLikeliness = 50f; // from 0 to 100
+    public List<GameObject> environmentalSpawLocations, environmentObjects;
+    public float environmentalSpawnLikeliness = 50f; // from 0 to 100
+
 
     public void Rotate(int steps)
     {
@@ -57,12 +67,6 @@ public class SnCSquare : MonoBehaviour
         }
     }
 
-    /*
-     * 0 = left,
-     * 1 = top,
-     * 2 = right,
-     * 3 = bottom;
-     */
     public bool IsSideFree(int side) 
     {
         switch (side) 
@@ -127,6 +131,12 @@ public class SnCSquare : MonoBehaviour
             yield return new WaitForFixedUpdate();
             timer += Time.fixedDeltaTime;
             transform.position = Vector3.Lerp(startPos, targetPos, curve.Evaluate(timer/time));
+
+            if (!SnCSessionManager.bAllowAnimCoroutines)
+            {
+                transform.position = startPos;
+                break;
+            }
         }
         if (bDestroy)
             Destroy(this.gameObject);
@@ -134,6 +144,7 @@ public class SnCSquare : MonoBehaviour
 
     IEnumerator Shake() 
     {
+        Vector3 startPos = transform.position;
         float timer = 0;
         float xExtend = 0;
         float zExtend = 0;
@@ -141,6 +152,7 @@ public class SnCSquare : MonoBehaviour
             xExtend = shakeIntensity;
         else
             zExtend = shakeIntensity;
+
         while (shakeTime > timer)
         {
             yield return new WaitForFixedUpdate();
@@ -149,6 +161,11 @@ public class SnCSquare : MonoBehaviour
                 transform.position.x + Mathf.Sin(timer * xExtend) * shakeRange,
                 transform.position.y,
                 transform.position.z + Mathf.Sin(timer * zExtend) * shakeRange);
+            if (!SnCSessionManager.bAllowAnimCoroutines)
+            {
+                transform.position = startPos;
+                break;
+            }
         }
         bShakeCompleted = true;
     }
@@ -156,5 +173,27 @@ public class SnCSquare : MonoBehaviour
     public void Reset()
     {
         bShakeCompleted = false;
+    }
+
+    public void ChangeMaterial(List<Material> materialSet) 
+    {
+        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        Material[] tempMaterials = new Material[renderer.materials.Length];
+        for (int i = 0; i < renderer.materials.Length; i++) 
+        {
+            tempMaterials[i] = materialSet[i];
+        }
+        if (gameObject.name.Contains("Straight")) //quick hardcode due to wrong material order with one FBX asset (Street_Straight)
+            tempMaterials = SwitchMaterial(tempMaterials, 1, 2);
+
+        renderer.materials = tempMaterials;
+    }
+
+    Material[] SwitchMaterial(Material[] materialArray, int firstMat, int secondMat) 
+    {
+        Material tempMaterial = materialArray[firstMat];
+        materialArray[firstMat] = materialArray[secondMat];
+        materialArray[secondMat] = tempMaterial;
+        return materialArray;
     }
 }

@@ -9,24 +9,31 @@ public class SnCSpawnManager : MonoBehaviour
     BoxCollider[] startSquareColliders; 
     GameObject _GOcurrentSquare, _GOnextSquare, _GOpreviousSquare;
     SnCSquare _currentSquare, _nextSquare, _previousSquare;
+    SnCSessionManager _sessionManager;
     Vector3 _newSquarePos, _startSquarePos;
 
     void Start()
     {
+        _sessionManager = GetComponent<SnCSessionManager>(); //attached to same GameObject
+        _sessionManager.materialRef.ChangeCurrentMaterialSet();
         startSquareColliders = GOstartSquare.GetComponents<BoxCollider>();
         _startSquarePos = GOstartSquare.transform.position;
         GOstartSquare.GetComponent<SnCSquare>().entrySide = 3; //no new square behind car at beginning
+
+
         SetSquare(GOstartSquare);
         StartCoroutine("CoroutineSpawnSquares");
     }
 
     void SetSquare(GameObject nextSquare) 
     {
+        //remove if not start square
         if (_GOpreviousSquare != null && _GOpreviousSquare != GOstartSquare)
             _previousSquare.AnimateRemoval(true);
         if (GOstartSquare == _GOpreviousSquare)
             SetStartSquare(false);
 
+        //check if beginning square
         if (_GOcurrentSquare != null)
         {
             _GOpreviousSquare = _GOcurrentSquare;
@@ -40,7 +47,17 @@ public class SnCSpawnManager : MonoBehaviour
 
     IEnumerator CoroutineSpawnSquares() 
     {
-        yield return new WaitForSeconds(startCountdown);
+        //Countdown
+        for (int countdown = 3; countdown > 0; countdown--)
+        {
+            _sessionManager.UIRef.SetCountdownUI(countdown);
+            yield return new WaitForSeconds(startCountdown/3);
+        }
+        _sessionManager.EnableInput(true);
+        _sessionManager.UIRef.SetCountdownUI("");
+        SnCSessionManager.bAllowAnimCoroutines = true;
+
+        //Spawn Iteration
         while (true)
         {
             yield return new WaitForSeconds(interval);
@@ -55,6 +72,7 @@ public class SnCSpawnManager : MonoBehaviour
 
         _GOnextSquare = Instantiate(GetComponent<SnCSquareLibrary>().GetRandomSquare());
         _nextSquare = _GOnextSquare.GetComponent<SnCSquare>();
+        _nextSquare.ChangeMaterial(_sessionManager.materialRef.currentMaterials);
         _GOnextSquare.transform.position = _newSquarePos + new Vector3(0f, _nextSquare.creationHeight, 0f);
         CheckNextVerticalOffset();
         _nextSquare.entrySide = SnCStaticLibrary.GetNextEntrySideToCurrentExitSideValue(randomSide);
@@ -108,19 +126,25 @@ public class SnCSpawnManager : MonoBehaviour
 
     public void Reset()
     {
-        StopAllCoroutines();
+        SetStartSquare(true);
+
         if (_GOcurrentSquare != GOstartSquare)
             Destroy(_GOcurrentSquare);
         if (_GOpreviousSquare != GOstartSquare)
             Destroy(_GOpreviousSquare);
 
-
+        StopEveryCoroutine();
         _GOpreviousSquare = null;
         _GOnextSquare = null;
         _GOcurrentSquare = GOstartSquare;
 
-        SetStartSquare(true);
         _currentSquare = GOstartSquare.GetComponent<SnCSquare>();
         StartCoroutine("CoroutineSpawnSquares");
+    }
+
+    void StopEveryCoroutine() 
+    {
+        StopAllCoroutines();
+        SnCSessionManager.bAllowAnimCoroutines = false;
     }
 }

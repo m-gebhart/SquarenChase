@@ -9,6 +9,9 @@ public class SnCPlayerCarController : MonoBehaviour
     public WheelCollider frontLeftWheel, frontRightWheel, backWheels;
     public Transform frontLeftTransform, frontRightTransform, backWheelsTransform;
     Vector3 startPos, startRot;
+    bool bCrashed = true; //=isAlive
+    public float maxAliveHeight = 10f, minAliveHeight = -5f;
+    public SnCSessionManager sessionManager;
 
     private void Awake()
     {
@@ -16,12 +19,13 @@ public class SnCPlayerCarController : MonoBehaviour
         startRot = new Vector3 (transform.rotation.x, transform.rotation.y, transform.rotation.z);
     }
 
-    private void FixedUpdate()
+    public void CustomUpdate()
     {
         CheckInput();
         SetSteeringAngle();
         SetAcceleration();
         UpdateWheels();
+        CheckCrash();
     }
 
     void CheckInput() 
@@ -59,9 +63,27 @@ public class SnCPlayerCarController : MonoBehaviour
         wheelTransform.rotation = rot;
     }
 
+    void CheckCrash() 
+    {
+        if (transform.position.y > maxAliveHeight || transform.position.y < minAliveHeight)
+            CrashCar();
+    }
+
+    public void CrashCar() 
+    {
+        bCrashed = true;
+        sessionManager.EnableInput(false);
+        SnCSessionManager.bInputEnabled = false;
+        sessionManager.UIRef.SetCountdownUI("Crash!");
+        sessionManager.UIRef.SetRestartText(true);
+    }
+
     public void Reset()
     {
         transform.position = startPos;
         transform.eulerAngles = startRot;
+        GetComponent<Rigidbody>().useGravity = false;
     }
+
+
 }
