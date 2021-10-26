@@ -9,7 +9,7 @@ public class SnCPlayerCarController : MonoBehaviour
     public WheelCollider frontLeftWheel, frontRightWheel, backWheels;
     public Transform frontLeftTransform, frontRightTransform, backWheelsTransform;
     Vector3 startPos, startRot;
-    bool bCrashed = true; //=isAlive
+    public bool bCrashed = false; //!=isAlive
     public float maxAliveHeight = 10f, minAliveHeight = -5f;
     public SnCSessionManager sessionManager;
 
@@ -83,7 +83,6 @@ public class SnCPlayerCarController : MonoBehaviour
         transform.position = startPos;
         transform.rotation = new Quaternion(startRot.x, startRot.y, startRot.z, 1f);
         GetComponent<Rigidbody>().useGravity = false;
+        bCrashed = false;
     }
-
-
 }

@@ -26,7 +26,20 @@ public class SnCSpawnManager : MonoBehaviour
         StartCoroutine("CoroutineSpawnSquares");
     }
 
-    void SetSquare(GameObject nextSquare) 
+    void SetStartSquare(bool bEnabled)
+    {
+        bOnStartSquare = bEnabled;
+        if (!bEnabled)
+            GOstartSquare.GetComponent<SnCSquare>().AnimateRemoval(false);
+        else
+        {
+            GOstartSquare.GetComponent<SnCSquare>().exitSide = 2; //leaving at right side
+            GOstartSquare.transform.position = _startSquarePos;
+            GOstartSquare.GetComponent<SnCSquare>().Reset();
+        }
+    }
+
+    void SetSquare(GameObject nextSquare)
     {
         //remove if not start square
         if (_GOpreviousSquare != null && _GOpreviousSquare != GOstartSquare)
@@ -59,7 +72,7 @@ public class SnCSpawnManager : MonoBehaviour
         SnCSessionManager.bAllowAnimCoroutines = true;
 
         //Spawn Iteration
-        while (true)
+        while (!_sessionManager.carRef.bCrashed)
         {
             yield return new WaitForSeconds(interval);
             SpawnSquare();
@@ -83,6 +96,7 @@ public class SnCSpawnManager : MonoBehaviour
         }
         SetSquare(_GOnextSquare);
         _nextSquare.AnimateCreation();
+        _nextSquare.SpawnCoins(scoreTriggerPrefab);
     }
 
     Vector3 GetNewSpawnPos(int side) 
@@ -112,19 +126,6 @@ public class SnCSpawnManager : MonoBehaviour
             _GOnextSquare.transform.position += new Vector3(0f, _nextSquare.verticalOffset, 0f);
         else if (_nextSquare.verticalOffset == 0f && _currentSquare.verticalOffset != 0f) 
             _GOnextSquare.transform.position += new Vector3(0f, -_currentSquare.verticalOffset, 0f);
-    }
-
-    void SetStartSquare(bool bEnabled) 
-    {
-        bOnStartSquare = bEnabled;
-        if (!bEnabled)
-            GOstartSquare.GetComponent<SnCSquare>().AnimateRemoval(false);
-        else
-        {
-            GOstartSquare.GetComponent<SnCSquare>().exitSide = 2; //leaving at right side
-            GOstartSquare.transform.position = _startSquarePos;
-            GOstartSquare.GetComponent<SnCSquare>().Reset();
-        }
     }
 
     public void Reset()

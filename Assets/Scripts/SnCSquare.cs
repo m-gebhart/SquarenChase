@@ -27,8 +27,10 @@ public class SnCSquare : MonoBehaviour
 
     [Header("Extras Spawn Locations")]
     public List<GameObject> coinSpawnLocations;
+    [Range(0f,100f)]
     public float coinSpawnLikeliness = 50f; // from 0 to 100
-    public List<GameObject> environmentalSpawLocations, environmentObjects;
+    public List<GameObject> environmentalSpawnLocations, environmentObjects;
+    [Range(0f, 100f)]
     public float environmentalSpawnLikeliness = 50f; // from 0 to 100
 
 
@@ -195,5 +197,21 @@ public class SnCSquare : MonoBehaviour
         materialArray[firstMat] = materialArray[secondMat];
         materialArray[secondMat] = tempMaterial;
         return materialArray;
+    }
+
+    float coinSpawnHeight = 0.0025f;
+
+    public void SpawnCoins(GameObject coinPrefab)
+    {
+        foreach(GameObject spawnLocation in coinSpawnLocations) 
+        {
+            if (Random.Range(0, 100) < coinSpawnLikeliness)
+            {
+                GameObject newCoin = Instantiate(coinPrefab);
+                newCoin.transform.parent = spawnLocation.transform;
+                newCoin.transform.localPosition = Vector3.zero;
+                newCoin.GetComponent<SnCCoin>().InitializeCoin(true, GameObject.Find("GameManager").GetComponent<SnCSessionManager>());
+            }
+        }
     }
 }

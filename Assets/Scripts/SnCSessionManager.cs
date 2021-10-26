@@ -66,7 +66,7 @@ public class SnCSessionManager : MonoBehaviour
         Camera.main.backgroundColor = materialRef.currentColorMaterialSet.skyBoxColor;
     }
 
-    void SetScore(int newScore) 
+    public void SetScore(int newScore) 
     {
         score = newScore;
         if (score > highScore)

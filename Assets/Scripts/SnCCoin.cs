@@ -5,21 +5,29 @@ using UnityEngine;
 public class SnCCoin : MonoBehaviour
 {
     public float rotateSpeed = 50f, floatRange = 0.1f, floatSpeed = 1f;
+    bool bAnimating = false;
     Vector3 startPos = Vector3.zero;
-    private void Awake()
+    SnCSessionManager _sessionManager;
+
+    public void InitializeCoin(bool bStartAnim, SnCSessionManager sessionManager) 
     {
-        startPos = transform.position;
+        _sessionManager = sessionManager;
+        startPos = transform.parent.localPosition;
+        bAnimating = bStartAnim;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        transform.Rotate(0, 0f, rotateSpeed * Time.deltaTime);
-        transform.position = startPos + new Vector3(0f, Mathf.Sin(Time.time*floatSpeed)*floatRange, 0f);
+        if (bAnimating)
+        {
+            transform.Rotate(0, 0f, rotateSpeed * Time.fixedDeltaTime);
+            //transform.localPosition = startPos + new Vector3(0f, Mathf.Sin(Time.time * floatSpeed) * floatRange, 0f);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        SnCSessionManager.score++;
+        _sessionManager.SetScore(SnCSessionManager.score + 1);
         Destroy(this.gameObject);
     }
 }

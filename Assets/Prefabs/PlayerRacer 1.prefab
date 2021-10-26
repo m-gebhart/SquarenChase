@@ -309,8 +309,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8848810374240701247, guid: 8d18eeab1ca84d941a24bb4de1e971d8, type: 3}
-  - {fileID: -7184292951177722594, guid: 8d18eeab1ca84d941a24bb4de1e971d8, type: 3}
+  - {fileID: 2100000, guid: 4975de0734cacca4bba9eb5be0c7c92c, type: 2}
+  - {fileID: 2100000, guid: e9d6aa14f3b61614e8bb78712f9e2d5f, type: 2}
   - {fileID: -5243988174349660497, guid: 8d18eeab1ca84d941a24bb4de1e971d8, type: 3}
   - {fileID: -1598722958210515638, guid: 8d18eeab1ca84d941a24bb4de1e971d8, type: 3}
   - {fileID: 4376495798698692818, guid: 8d18eeab1ca84d941a24bb4de1e971d8, type: 3}
@@ -422,6 +422,7 @@ MonoBehaviour:
   frontLeftTransform: {fileID: 1204668933144624831}
   frontRightTransform: {fileID: 3480195931344266933}
   backWheelsTransform: {fileID: 4591972658321985900}
+  bCrashed: 0
   maxAliveHeight: 4
   minAliveHeight: -3
   sessionManager: {fileID: 0}
