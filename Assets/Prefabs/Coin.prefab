@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateSpeed: 80
-  floatRange: 0.05
+  floatRange: 0.0005
   floatSpeed: 1
 --- !u!65 &1072733926874899541
 BoxCollider:

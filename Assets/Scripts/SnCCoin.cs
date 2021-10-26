@@ -6,13 +6,11 @@ public class SnCCoin : MonoBehaviour
 {
     public float rotateSpeed = 50f, floatRange = 0.1f, floatSpeed = 1f;
     bool bAnimating = false;
-    Vector3 startPos = Vector3.zero;
     SnCSessionManager _sessionManager;
 
     public void InitializeCoin(bool bStartAnim, SnCSessionManager sessionManager) 
     {
         _sessionManager = sessionManager;
-        startPos = transform.parent.localPosition;
         bAnimating = bStartAnim;
     }
 
@@ -21,7 +19,7 @@ public class SnCCoin : MonoBehaviour
         if (bAnimating)
         {
             transform.Rotate(0, 0f, rotateSpeed * Time.fixedDeltaTime);
-            //transform.localPosition = startPos + new Vector3(0f, Mathf.Sin(Time.time * floatSpeed) * floatRange, 0f);
+            transform.localPosition = new Vector3(0f, 0f, Mathf.Sin(Time.time * floatSpeed) * floatRange);
         }
     }
 

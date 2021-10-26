@@ -199,8 +199,6 @@ public class SnCSquare : MonoBehaviour
         return materialArray;
     }
 
-    float coinSpawnHeight = 0.0025f;
-
     public void SpawnCoins(GameObject coinPrefab)
     {
         foreach(GameObject spawnLocation in coinSpawnLocations) 
