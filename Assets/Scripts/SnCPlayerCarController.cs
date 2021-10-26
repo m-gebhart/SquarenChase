@@ -81,7 +81,7 @@ public class SnCPlayerCarController : MonoBehaviour
     public void Reset()
     {
         transform.position = startPos;
-        transform.eulerAngles = startRot;
+        transform.rotation = new Quaternion(startRot.x, startRot.y, startRot.z, 1f);
         GetComponent<Rigidbody>().useGravity = false;
     }
 

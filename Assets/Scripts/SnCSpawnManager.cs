@@ -11,15 +11,16 @@ public class SnCSpawnManager : MonoBehaviour
     SnCSquare _currentSquare, _nextSquare, _previousSquare;
     SnCSessionManager _sessionManager;
     Vector3 _newSquarePos, _startSquarePos;
+    bool bOnStartSquare = true;
 
     void Start()
     {
         _sessionManager = GetComponent<SnCSessionManager>(); //attached to same GameObject
         _sessionManager.materialRef.ChangeCurrentMaterialSet();
+
+        //cache start square values
         startSquareColliders = GOstartSquare.GetComponents<BoxCollider>();
         _startSquarePos = GOstartSquare.transform.position;
-        GOstartSquare.GetComponent<SnCSquare>().entrySide = 3; //no new square behind car at beginning
-
 
         SetSquare(GOstartSquare);
         StartCoroutine("CoroutineSpawnSquares");
@@ -67,15 +68,15 @@ public class SnCSpawnManager : MonoBehaviour
 
     void SpawnSquare() 
     {
-        int randomSide = _currentSquare.GetAnyFreeSide();
-        _newSquarePos = GetNewSpawnPos(randomSide);
+        int randomExitSide = _currentSquare.exitSide == -1 ? _currentSquare.GetAnyFreeSide() : _currentSquare.exitSide;
+        _newSquarePos = GetNewSpawnPos(randomExitSide);
 
         _GOnextSquare = Instantiate(GetComponent<SnCSquareLibrary>().GetRandomSquare());
         _nextSquare = _GOnextSquare.GetComponent<SnCSquare>();
         _nextSquare.ChangeMaterial(_sessionManager.materialRef.currentMaterials);
         _GOnextSquare.transform.position = _newSquarePos + new Vector3(0f, _nextSquare.creationHeight, 0f);
         CheckNextVerticalOffset();
-        _nextSquare.entrySide = SnCStaticLibrary.GetNextEntrySideToCurrentExitSideValue(randomSide);
+        _nextSquare.entrySide = SnCStaticLibrary.GetNextEntrySideToCurrentExitSideValue(randomExitSide);
         while (!_nextSquare.IsSideFree(_nextSquare.entrySide)) 
         {
             _nextSquare.Rotate(1);
@@ -115,12 +116,14 @@ public class SnCSpawnManager : MonoBehaviour
 
     void SetStartSquare(bool bEnabled) 
     {
+        bOnStartSquare = bEnabled;
         if (!bEnabled)
             GOstartSquare.GetComponent<SnCSquare>().AnimateRemoval(false);
         else
         {
-            GOstartSquare.GetComponent<SnCSquare>().Reset();
+            GOstartSquare.GetComponent<SnCSquare>().exitSide = 2; //leaving at right side
             GOstartSquare.transform.position = _startSquarePos;
+            GOstartSquare.GetComponent<SnCSquare>().Reset();
         }
     }
 

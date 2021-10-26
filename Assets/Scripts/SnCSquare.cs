@@ -184,12 +184,12 @@ public class SnCSquare : MonoBehaviour
             tempMaterials[i] = materialSet[i];
         }
         if (gameObject.name.Contains("Straight")) //quick hardcode due to wrong material order with one FBX asset (Street_Straight)
-            tempMaterials = SwitchMaterial(tempMaterials, 1, 2);
+            tempMaterials = SwitchMaterials(tempMaterials, 1, 2);
 
         renderer.materials = tempMaterials;
     }
 
-    Material[] SwitchMaterial(Material[] materialArray, int firstMat, int secondMat) 
+    Material[] SwitchMaterials(Material[] materialArray, int firstMat, int secondMat) 
     {
         Material tempMaterial = materialArray[firstMat];
         materialArray[firstMat] = materialArray[secondMat];
