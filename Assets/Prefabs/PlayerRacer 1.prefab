@@ -414,17 +414,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5f1ce735a568a429583aec259a6a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  motorTorque:
+    torqueCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    maxSpeed: 50
+    accelerationTime: 1
   maxSteeringAngle: 40
-  motorForce: 50
-  bounceBackRange: 0.15
-  bounceTime: 0.35
+  bounceBackRange: 0.1
+  bounceTime: 0.2
   minBounceLocalZPoint: 1.5
+  bounceRotSpeed: 75
   frontLeftWheel: {fileID: 9124830693484133879}
   frontRightWheel: {fileID: 9124830693937319738}
   backWheels: {fileID: 9124830693225417530}
   frontLeftTransform: {fileID: 1204668933144624831}
   frontRightTransform: {fileID: 3480195931344266933}
   backWheelsTransform: {fileID: 4591972658321985900}
+  bIsBouncing: 0
   bCrashed: 0
   maxAliveHeight: 4
   minAliveHeight: -3

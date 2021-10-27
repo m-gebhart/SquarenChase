@@ -214,6 +214,7 @@ MonoBehaviour:
   libraryRef: {fileID: 340314447}
   UIRef: {fileID: 2065243232}
   materialRef: {fileID: 340314449}
+  bEditorStaticPlayground: 0
 --- !u!114 &340314449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -894,6 +895,7 @@ GameObject:
   - component: {fileID: 2065243234}
   - component: {fileID: 2065243233}
   - component: {fileID: 2065243232}
+  - component: {fileID: 2065243237}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1001,6 +1003,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!65 &2065243237
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065243231}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2094283527
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,16 +1169,36 @@ PrefabInstance:
       value: PlayerRacer
       objectReference: {fileID: 0}
     - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
-      propertyPath: bounceTime
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
       propertyPath: sessionManager
       value: 
       objectReference: {fileID: 340314448}
     - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
-      propertyPath: bounceBackRange
-      value: 0.05
+      propertyPath: motorTorqueLevels.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[0].time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[1].time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[2].time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[0].motorTorque
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[1].motorTorque
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: motorTorqueLevels.Array.data[2].motorTorque
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 8731160635103897141, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
       propertyPath: m_RootOrder

@@ -2,29 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO: DRIFT, right Bounce recognit, rotate on bounce
+
+[System.Serializable]
+public struct MotorTorque 
+{
+    public AnimationCurve torqueCurve;
+    public float maxSpeed;
+    public float accelerationTime;
+}
+
 public class SnCPlayerCarController : MonoBehaviour
 {
     float _xInput, _yInput, _steeringAngle, highSpeedThreshold = 5f;
-    public float maxSteeringAngle = 40f, motorForce = 50f, bounceBackRange = 0.5f, bounceTime = 0.5f, minBounceLocalZPoint = 1.5f;
-    bool bIsBouncing = false;
+    public MotorTorque motorTorque;
+    public float maxSteeringAngle = 40f, bounceBackRange = 0.5f, bounceTime = 0.5f, minBounceLocalZPoint = 1.5f, bounceRotSpeed = 1f;
     public WheelCollider frontLeftWheel, frontRightWheel, backWheels;
     public Transform frontLeftTransform, frontRightTransform, backWheelsTransform;
-    Vector3 startPos, startRot;
-    public bool bCrashed = false; //!=isAlive
+    Vector3 _startPos, _startRot, _bouncePos, _startBouncePos, _targetBouncePos;
+    [HideInInspector]
+    public bool bIsBouncing = false, bCrashed = false; //!=isAlive
     public float maxAliveHeight = 10f, minAliveHeight = -5f;
     public SnCSessionManager sessionManager;
 
     private void Awake()
     {
-        startPos = transform.position;
-        startRot = new Vector3 (transform.rotation.x, transform.rotation.y, transform.rotation.z);
+        _startPos = transform.position;
+        _startRot = new Vector3 (transform.rotation.x, transform.rotation.y, transform.rotation.z);
     }
 
     public void CustomUpdate()
     {
         CheckInput();
         SetSteeringAngle();
-        SetAcceleration();
+        UpdateAcceleration();
         UpdateWheels();
         CheckCrash();
     }
@@ -41,13 +52,28 @@ public class SnCPlayerCarController : MonoBehaviour
         frontLeftWheel.steerAngle =  frontRightWheel.steerAngle = _steeringAngle;
     }
 
-    void SetAcceleration() 
+    float _torqueInputValue = 0f;
+    void SetTorqueInputValue(float newValue) 
     {
-        frontLeftWheel.motorTorque = frontRightWheel.motorTorque = !bIsBouncing ? _yInput * motorForce : 0f;
+        _torqueInputValue = newValue;
+    }
+    void UpdateAcceleration() 
+    {
+        float torque = 0f;
+        if (_yInput != 0f && SnCSessionManager.bInputEnabled)
+        {
+            _torqueInputValue += Time.deltaTime;
+            torque = motorTorque.torqueCurve.Evaluate(_torqueInputValue) * motorTorque.maxSpeed * _yInput;
+        }
+        else if (_torqueInputValue > 0f)
+            _torqueInputValue -= Time.deltaTime;
+        frontLeftWheel.motorTorque = frontRightWheel.motorTorque = torque;
     }
 
     private void UpdateWheels()
     {
+        if (bIsBouncing)
+            UpdateBounceBack();
         UpdateWheel(frontLeftWheel, frontLeftTransform);
         UpdateWheel(frontRightWheel, frontRightTransform);
         UpdateWheel(backWheels, backWheelsTransform);
@@ -59,12 +85,8 @@ public class SnCPlayerCarController : MonoBehaviour
         Quaternion rot = wheelTransform.rotation;
 
         wheelCollider.GetWorldPose(out pos, out rot);
-
-        if (!bIsBouncing)
-        {
-            wheelTransform.position = pos;
-            wheelTransform.rotation = rot;
-        }
+        wheelTransform.position = pos;
+        wheelTransform.rotation = rot;
     }
 
     void CheckCrash() 
@@ -94,21 +116,13 @@ public class SnCPlayerCarController : MonoBehaviour
         {
             Vector3 contactPoint = collision.GetContact(0).point;
             if (ShouldBounceBack(contactPoint))
-            {
-                /*Debug.Log("BOUNCE");
-                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                cube.GetComponent<BoxCollider>().enabled = false;
-                cube.transform.position = transform.position + collision.GetContact(0).normal * bounceBackRange;*/
-                StartCoroutine(BounceAnimation(transform.position + collision.GetContact(0).normal * bounceBackRange));
-            }//;
-            //Vector3.MoveTowards(transform.position, transform.position + collision.GetContact(0).normal*bounceBackRange, bounceBackRange);
+                StartBounceBack(collision.GetContact(0));
         }
     }
 
     bool IsAtHighSpeed() 
     {
-        return Mathf.Abs(frontLeftWheel.motorTorque) > motorForce - highSpeedThreshold || Mathf.Abs(frontRightWheel.motorTorque) > motorForce - highSpeedThreshold;
+        return Mathf.Abs(frontLeftWheel.motorTorque) > motorTorque.maxSpeed - highSpeedThreshold || Mathf.Abs(frontRightWheel.motorTorque) > motorTorque.maxSpeed - highSpeedThreshold;
     }
 
     bool ShouldBounceBack(Vector3 contactPosition) 
@@ -116,28 +130,42 @@ public class SnCPlayerCarController : MonoBehaviour
         return Mathf.Abs(this.transform.InverseTransformPoint(contactPosition).z) > minBounceLocalZPoint;
     }
 
-    IEnumerator BounceAnimation(Vector3 targetPos) 
+    void StartBounceBack(ContactPoint localContactPoint) 
     {
-        Vector3 startPos = transform.position;
         bIsBouncing = true;
-        float timer = 0f;
-        while (bIsBouncing) 
-        {
-            yield return new WaitForFixedUpdate();
-            timer += Time.fixedDeltaTime;
-            transform.position = Vector3.Lerp(startPos, targetPos, timer/bounceTime);
-            //TODO: transform.Rotate(0f, 0.03f, 0f, Space.World);
-            //TODO: no bounce when side hit wall
-            if (timer >= bounceTime)
-                bIsBouncing = false;
-        }
+        _startBouncePos = transform.position;
+        _targetBouncePos = transform.position + localContactPoint.normal * bounceBackRange;
+        if (localContactPoint.point.z - transform.position.z > 0f) //collision on car's left side
+            _bounceRotDir = 1;
+        else
+            _bounceRotDir = -1;
+        _bounceTimer = 0f;
+        SetTorqueInputValue(0f);
+    }
+
+    float _bounceTimer = 0f;
+    int _bounceRotDir = 0;
+    void UpdateBounceBack()
+    {
+        _bounceTimer += Time.fixedDeltaTime;
+        _bouncePos = Vector3.Lerp(_startBouncePos, _targetBouncePos , _bounceTimer / bounceTime);
+        transform.position = _bouncePos;
+        transform.Rotate(new Vector3(0f, bounceRotSpeed*Time.deltaTime*_bounceRotDir, 0f));
+        if (_bounceTimer >= bounceTime)
+            bIsBouncing = false;
+    }
+
+    public Vector3 GetBounceBackPosition() 
+    {
+        return _bouncePos;
     }
 
     public void Reset()
     {
-        transform.position = startPos;
-        transform.rotation = new Quaternion(startRot.x, startRot.y, startRot.z, 1f);
+        transform.position = _startPos;
+        transform.rotation = new Quaternion(_startRot.x, _startRot.y, _startRot.z, 1f);
         GetComponent<Rigidbody>().useGravity = false;
         bCrashed = false;
+        bIsBouncing = false;
     }
 }

@@ -71,6 +71,10 @@ public class SnCSpawnManager : MonoBehaviour
         _sessionManager.UIRef.SetCountdownUI("");
         SnCSessionManager.bAllowAnimCoroutines = true;
 
+        #if UNITY_EDITOR
+        if (_sessionManager.bEditorStaticPlayground)
+            yield break;
+        #endif
         //Spawn Iteration
         while (!_sessionManager.carRef.bCrashed)
         {

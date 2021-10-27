@@ -16,6 +16,10 @@ public class SnCSessionManager : MonoBehaviour
     public SnCUIManager UIRef;
     public SnCMaterialManager materialRef;
 
+#if UNITY_EDITOR
+    public bool bEditorStaticPlayground = false;
+#endif
+
     private void Start()
     {
         UIRef.SetHighScoreUI(GetHighScore());
