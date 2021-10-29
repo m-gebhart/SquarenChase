@@ -68,7 +68,7 @@ public class SnCSpawnManager : MonoBehaviour
             yield return new WaitForSeconds(startCountdown/3);
         }
         _sessionManager.EnableInput(true);
-        _sessionManager.UIRef.SetCountdownUI("");
+        _sessionManager.UIRef.SetCountdownUI("", Color.white);
         SnCSessionManager.bAllowAnimCoroutines = true;
 
         #if UNITY_EDITOR

@@ -440,18 +440,23 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     maxSpeed: 50
-    accelerationTime: 1
+    brakeTorque: 65
   maxSteeringAngle: 40
+  driftSpeed: 100
+  preDriftTime: 0.35
   bounceBackRange: 0.1
-  bounceTime: 0.2
-  minBounceLocalZPoint: 1.5
+  bounceTime: 1
   bounceRotSpeed: 75
+  sideCollisionSlowDown: 1
+  xCastDistance: 0.075
+  zCastDistance: 0.2
   frontLeftWheel: {fileID: 9124830693484133879}
   frontRightWheel: {fileID: 9124830693937319738}
   backWheels: {fileID: 9124830693225417530}
   frontLeftTransform: {fileID: 1204668933144624831}
   frontRightTransform: {fileID: 3480195931344266933}
   backWheelsTransform: {fileID: 4591972658321985900}
+  bBounceEnabled: 1
   bIsBouncing: 0
   bCrashed: 0
   maxAliveHeight: 4
@@ -503,7 +508,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 200
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
@@ -564,7 +569,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 200
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
@@ -658,7 +663,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 200
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4

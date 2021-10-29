@@ -11,16 +11,19 @@ public class SnCUIManager : MonoBehaviour
     public void SetCountdownUI(int countdownValue) 
     {
         countdownText.text = countdownValue.ToString();
+        countdownText.color = Color.white;
     }
 
     public void SetCountdownUI(float countdownValue) 
     {
         countdownText.text = Mathf.RoundToInt(countdownValue).ToString();
+        countdownText.color = Color.white;
     }
 
-    public void SetCountdownUI(string newCountdownText)
+    public void SetCountdownUI(string newCountdownText, Color color)
     {
         countdownText.text = newCountdownText;
+        countdownText.color = color;
     }
 
     public void SetHighScoreUI(int newHighScore) 
