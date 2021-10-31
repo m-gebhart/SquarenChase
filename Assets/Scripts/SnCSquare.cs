@@ -18,6 +18,8 @@ public class SnCSquare : MonoBehaviour
 
     [Header("Shake Animation")]
     public bool bShouldShake = true;
+    [HideInInspector]
+    public bool bIsShaking = false;
     bool bShakeCompleted = false;
     public float shakeTime, shakeRange, shakeIntensity;
 
@@ -118,7 +120,10 @@ public class SnCSquare : MonoBehaviour
     public void AnimateRemoval(bool bShouldDestroy) 
     {
         if (bShouldShake)
+        {
             StartCoroutine("Shake");
+            bIsShaking = true;
+        }
         StartCoroutine(PlayHeightCurve(removalYCurve, transform.position, removalTime, removalHeight, bShouldShake, bShouldDestroy));
     }
 
@@ -170,11 +175,13 @@ public class SnCSquare : MonoBehaviour
             }
         }
         bShakeCompleted = true;
+        bIsShaking = false;
     }
 
     public void Reset()
     {
         bShakeCompleted = false;
+        bIsShaking = false;
     }
 
     public void ChangeMaterial(List<Material> materialSet) 
@@ -199,7 +206,7 @@ public class SnCSquare : MonoBehaviour
         return materialArray;
     }
 
-    public void SpawnCoins(GameObject coinPrefab)
+    public void SpawnCoins(GameObject coinPrefab, SnCSessionManager gameManager)
     {
         foreach(GameObject spawnLocation in coinSpawnLocations) 
         {
@@ -207,8 +214,8 @@ public class SnCSquare : MonoBehaviour
             {
                 GameObject newCoin = Instantiate(coinPrefab);
                 newCoin.transform.parent = spawnLocation.transform;
-                newCoin.transform.localPosition = Vector3.zero;
-                newCoin.GetComponent<SnCCoin>().InitializeCoin(true, GameObject.Find("GameManager").GetComponent<SnCSessionManager>());
+                newCoin.transform.localPosition = new Vector3(0f, 0f, 0.002f);
+                newCoin.GetComponent<SnCCoin>().InitializeCoin(true, gameManager);
             }
         }
     }

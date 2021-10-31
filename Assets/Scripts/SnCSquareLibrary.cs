@@ -10,6 +10,7 @@ public class SnCSquareLibrary : MonoBehaviour
 
     public List<GameObject> Level1Square;
     public List<GameObject> Level2Square;
+    public List<GameObject> Level3Square;
 
     private void Start()
     {
@@ -30,6 +31,8 @@ public class SnCSquareLibrary : MonoBehaviour
                 ListSquareSelection = Level1Square; break;
             case 1:
                 ListSquareSelection = Level2Square; break;
+            case 2:
+                ListSquareSelection = Level3Square; break;
         }
     }
 }

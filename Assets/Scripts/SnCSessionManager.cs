@@ -7,6 +7,7 @@ public class SnCSessionManager : MonoBehaviour
     [HideInInspector]
     public static int score = 0, intensity = 0;
     int highScore;
+    public float[] scoreIntensityLevels = new float[3] {10, 20, 25}; 
     [HideInInspector]
     public static bool bInputEnabled = false, bAllowAnimCoroutines = true;
     public SnCCamera cameraRef;
@@ -79,6 +80,12 @@ public class SnCSessionManager : MonoBehaviour
             UIRef.SetHighScoreUI(highScore);
         }
         UIRef.SetScoreUI(score);
+    }
+
+    void CheckIntensity(int currentScore) 
+    { 
+        if (intensity < scoreIntensityLevels.Length-1 && score > scoreIntensityLevels[intensity])
+                libraryRef.UpdateCurrentLibrary(++intensity);
     }
 
     void SetHighScore(int newHighScore) 

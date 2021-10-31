@@ -99,8 +99,8 @@ public class SnCSpawnManager : MonoBehaviour
             _nextSquare.Rotate(1);
         }
         SetSquare(_GOnextSquare);
+        _nextSquare.SpawnCoins(scoreTriggerPrefab, _sessionManager);
         _nextSquare.AnimateCreation();
-        _nextSquare.SpawnCoins(scoreTriggerPrefab);
     }
 
     Vector3 GetNewSpawnPos(int side) 
