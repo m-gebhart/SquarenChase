@@ -58,7 +58,7 @@ public class SnCSessionManager : MonoBehaviour
         bAllowAnimCoroutines = false;
         EnableInput(false);
         cameraRef.Reset();
-        carRef.Reset();
+        carRef.ResetPlayerCar();
         spawnRef.Reset();
         UIRef.SetRestartText(false);
         libraryRef.UpdateCurrentLibrary(0);

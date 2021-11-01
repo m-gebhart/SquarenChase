@@ -10055,26 +10055,14 @@ MonoBehaviour:
       m_RotationOrder: 4
     maxSpeed: 50
     accelerationTime: 1
-    brakeTorque: 100
-  maxSteeringAngle: 40
-  steeringForce: 0.7
-  driftSpeed: 100
-  preDriftTime: 0.1
+    brakeTorque: 150
+  currentTorque: 0
   bBounceEnabled: 1
-  frontBackBounceRange: 800
-  sideBounceRange: 0.05
+  frontBackBounceRange: 1000
+  sideBounceRange: 750
   bounceTime: 0.15
   bounceHeight: 0.1
   bounceRotSpeed: 50
-  sideCollisionSlowDown: 0.85
-  castOffset: 0.05
-  xCastDistance: 0.06
-  zCastDistance: 0.16
-  bCanCrash: 1
-  maxAliveHeight: 4
-  minAliveHeight: -3
-  maxRotation: 20
-  sessionManager: {fileID: 0}
   frontLeftWheel: {fileID: 9124830693484133879}
   frontRightWheel: {fileID: 9124830693937319738}
   backWheels: {fileID: 9124830693225417530}
@@ -10084,7 +10072,18 @@ MonoBehaviour:
   leftDriftEffect: {fileID: 5439298008100405282}
   rightDriftEffect: {fileID: 6146948696497345154}
   bIsBouncing: 0
+  bIsBraking: 0
   bCrashed: 0
+  sessionManager: {fileID: 0}
+  bDriftEnabled: 1
+  maxSteeringAngle: 40
+  steeringForce: 0.8
+  driftSpeed: 30
+  preDriftTime: 0.25
+  bCanCrash: 1
+  maxAliveHeight: 4
+  minAliveHeight: -3
+  maxRotation: 20
 --- !u!1 &9124830693225417528
 GameObject:
   m_ObjectHideFlags: 0

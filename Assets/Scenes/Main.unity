@@ -1184,10 +1184,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 340314448}
     - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
-      propertyPath: sideBounceRange
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
       propertyPath: motorTorqueLevels.Array.size
       value: 3
       objectReference: {fileID: 0}
