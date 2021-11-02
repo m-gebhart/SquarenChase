@@ -7,7 +7,8 @@ public class SnCPlayerCarController : SnCCarBehaviour
     public SnCSessionManager sessionManager;
     [Header("Player Control")]
     public bool bDriftEnabled = true;
-    public float maxSteeringAngle = 40f, steeringForce = 0.8f, driftSpeed = 20f, preDriftTime = 1f;
+    public float maxSteeringAngle = 40f, steeringForce = 0.8f, driftSpeed = 20f, preDriftTime = 1f, saveJumpSpeed = 50f, saveJumpHeight = 0.01f, saveJumpUpTime = 0.25f;
+    bool _bIsJumping = false;
     [Header("Crash")]
     public bool bCanCrash = true;
     public float maxAliveHeight = 10f, minAliveHeight = -5f, maxRotation = 35f;
@@ -21,25 +22,86 @@ public class SnCPlayerCarController : SnCCarBehaviour
     {
         _xInput = Input.GetAxis("Horizontal");
         _yInput = Input.GetAxis("Vertical");
-        if (Input.GetKeyDown("space"))
-            CheckRotation();
-    }
-
-    void CheckRotation() 
-    {
-        //Avoid Upside Down position
-        if (transform.eulerAngles.z > maxRotation || transform.eulerAngles.z < -maxRotation)
-        {
-            transform.eulerAngles =new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
-        }
     }
 
     public override void CustomUpdate()
     {
+        CheckSaveAction();
         SetSteeringAngle();
         base.CustomUpdate();
         CheckPlayerDrift();
         CheckPlayerCrash();
+    }
+
+    bool SurpassedMaxRotation() 
+    {
+        return (transform.eulerAngles.z > maxRotation && transform.eulerAngles.z-360f < -maxRotation) || (transform.eulerAngles.x > maxRotation && transform.eulerAngles.x - 360f < -maxRotation);
+    }
+
+    void CheckSaveAction() 
+    {
+        //if car is upside down
+        if (SurpassedMaxRotation())
+        {
+            if (GetSaveActionInput())
+                transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y, 0f);
+        }
+
+        //if car is stuck on edge
+        else if ((!frontLeftWheel.isGrounded && !frontRightWheel.isGrounded) || !backWheels.isGrounded)
+        {
+            if (GetSaveActionInput())
+            {
+                StartJump();
+            }
+        }
+        else
+            sessionManager.UIRef.SetSaveActionText(false);
+
+        if (_bIsJumping)
+            JumpUpdate();
+    }
+
+    bool GetSaveActionInput() 
+    {
+        //Set UI Text
+        if (!sessionManager.UIRef.IsSaveActionTextActive() && !sessionManager.spawnRef.bOnStartSquare)
+            sessionManager.UIRef.SetSaveActionText(true);
+        sessionManager.UIRef.saveActionWorldText.transform.parent.LookAt(Camera.main.transform.position);
+        sessionManager.UIRef.saveActionWorldText.transform.parent.position = transform.position + new Vector3(0f, 0.3f, 0f);
+
+        //GroundCar
+        if (Input.GetKey("space"))
+        {
+            sessionManager.UIRef.SetSaveActionText(false);
+            return true;
+        }
+        return false;
+    }
+
+    Vector3 _jumpTargetPos;
+    void StartJump() 
+    {
+        if (!_bIsJumping)
+        {
+            // start Jump
+            _bIsJumping = true;
+            _jumpTargetPos = transform.position + transform.TransformDirection(0f, 0.1f, _boxCollider.size.z * _yInput);
+            Debug.DrawRay(_jumpTargetPos, Vector3.up, Color.yellow);
+            Debug.Log("line drawn");
+        }
+        StartCoroutine("ResetJump");
+    }
+
+    void JumpUpdate() 
+    {
+        transform.Translate(new Vector3(0f, saveJumpHeight * Time.fixedDeltaTime, saveJumpSpeed * Time.fixedDeltaTime * _yInput));
+    }
+
+    IEnumerator ResetJump() 
+    {
+        yield return new WaitForSeconds(saveJumpUpTime);
+        _bIsJumping = false;
     }
 
     protected new void SetSteeringAngle()
@@ -106,21 +168,19 @@ public class SnCPlayerCarController : SnCCarBehaviour
 
     void BounceBackPlayerCar(Collision collision) 
     {
-        Debug.Log("Bounce");
+        SnCSessionManager.bInputEnabled = false;
         ECollisionSide collisionSide = GetCollisionSide(collision.GetContact(0).point);
         float bounceRange = collisionSide == ECollisionSide.left || collisionSide == ECollisionSide.right ? sideBounceRange : frontBackBounceRange;
 
-        Debug.DrawLine(collision.GetContact(0).point + collision.GetContact(0).normal * bounceRange * currentTorque, Vector3.up*10f, Color.yellow, 10f);
-
         _rigidbody.AddForce(collision.GetContact(0).normal * bounceRange * currentTorque);
 
-        float bounceDirection = 0f;
+        float rotDirection = 0f;
         if (collisionSide == ECollisionSide.left)
-            bounceDirection = 1f;
+            rotDirection = 1f;
         else if (collisionSide == ECollisionSide.right)
-            bounceDirection = -1f;
+            rotDirection = -1f;
 
-        transform.Rotate(0f, bounceRotSpeed * Time.fixedDeltaTime * bounceDirection, 0f);
+        transform.Rotate(0f, bounceRotSpeed * Time.fixedDeltaTime * rotDirection, 0f);
     }
 
     public void ResetPlayerCar()

@@ -168,6 +168,7 @@ public class SnCCarBehaviour : MonoBehaviour
     {
         yield return new WaitForSeconds(bounceTime);
         bIsBouncing = false;
+        SnCSessionManager.bInputEnabled = true;
     }
 
 

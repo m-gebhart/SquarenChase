@@ -6,20 +6,18 @@ public class SnCSpawnManager : MonoBehaviour
 {
     public float squareWidth = 10f, interval = 1f, startCountdown = 3f;
     public GameObject GOstartSquare, scoreTriggerPrefab;
-    BoxCollider[] startSquareColliders; 
     GameObject _GOcurrentSquare, _GOnextSquare, _GOpreviousSquare;
     SnCSquare _currentSquare, _nextSquare, _previousSquare;
     SnCSessionManager _sessionManager;
     Vector3 _newSquarePos, _startSquarePos;
-    bool bOnStartSquare = true;
+    [HideInInspector]
+    public bool bOnStartSquare = true;
 
     void Start()
     {
         _sessionManager = GetComponent<SnCSessionManager>(); //attached to same GameObject
         _sessionManager.materialRef.ChangeCurrentMaterialSet();
 
-        //cache start square values
-        startSquareColliders = GOstartSquare.GetComponents<BoxCollider>();
         _startSquarePos = GOstartSquare.transform.position;
 
         SetSquare(GOstartSquare);
