@@ -74,7 +74,7 @@ public class SnCSpawnManager : MonoBehaviour
             yield break;
         #endif
         //Spawn Iteration
-        while (!_sessionManager.carRef.bCrashed)
+        while (_sessionManager.carRef.GetCarState() != SnCCarBehaviour.ECarState.Crashed)
         {
             yield return new WaitForSeconds(interval);
             SpawnSquare();

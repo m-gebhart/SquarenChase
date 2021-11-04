@@ -217,9 +217,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreIntensityLevels:
+  - 5
   - 10
   - 20
-  - 30
   cameraRef: {fileID: 963194229}
   carRef: {fileID: 1978299405}
   spawnRef: {fileID: 340314445}
@@ -1359,6 +1359,10 @@ PrefabInstance:
     - target: {fileID: 8241729129830792335, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
       propertyPath: m_Name
       value: PlayerRacer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
+      propertyPath: bounceRotSpeed
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 8241729129830792337, guid: 72cc347ce46aea640822715dc2b4b0e2, type: 3}
       propertyPath: sessionManager

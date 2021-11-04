@@ -28,12 +28,12 @@ public class SnCSessionManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CheckInput();   
+        CheckUpdate();   
     }
 
-    void CheckInput() 
+    void CheckUpdate() 
     {
-        if (bInputEnabled)
+        if (bInputEnabled && !carRef.IsCarState(SnCCarBehaviour.ECarState.Crashed))
             carRef.CustomUpdate();
         if (Input.GetKey("r"))
             ResetSession();
@@ -60,7 +60,7 @@ public class SnCSessionManager : MonoBehaviour
         cameraRef.Reset();
         carRef.ResetPlayerCar();
         spawnRef.Reset();
-        UIRef.SetRestartText(false);
+        UIRef.ResetUI();
         libraryRef.UpdateCurrentLibrary(0);
         UpdateMaterial();
     }
@@ -80,12 +80,13 @@ public class SnCSessionManager : MonoBehaviour
             UIRef.SetHighScoreUI(highScore);
         }
         UIRef.SetScoreUI(score);
+        CheckIntensity(score);
     }
 
     void CheckIntensity(int currentScore) 
-    { 
-        if (intensity < scoreIntensityLevels.Length-1 && score > scoreIntensityLevels[intensity])
-                libraryRef.UpdateCurrentLibrary(++intensity);
+    {
+        if (intensity < scoreIntensityLevels.Length - 1 && score > scoreIntensityLevels[intensity])
+            IncrementIntensity();
     }
 
     void SetHighScore(int newHighScore) 

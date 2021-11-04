@@ -61,4 +61,11 @@ public class SnCUIManager : MonoBehaviour
     {
         return saveActionWorldText.enabled;
     }
+
+    public void ResetUI() 
+    {
+        SetRestartText(false);
+        SetScoreUI(0);
+        SetSaveActionText(false);
+    }
 }

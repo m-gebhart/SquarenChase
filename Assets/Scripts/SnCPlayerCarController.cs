@@ -6,12 +6,18 @@ public class SnCPlayerCarController : SnCCarBehaviour
 {
     public SnCSessionManager sessionManager;
     [Header("Player Control")]
-    public bool bDriftEnabled = true;
-    public float maxSteeringAngle = 40f, steeringForce = 0.8f, driftSpeed = 20f, preDriftTime = 1f, saveJumpSpeed = 50f, saveJumpHeight = 0.01f, saveJumpUpTime = 0.25f;
     bool _bIsJumping = false;
+    public float maxSteeringAngle = 40f, steeringForce = 0.8f, driftSpeed = 20f, preDriftTime = 1f, saveJumpSpeed = 50f, saveJumpHeight = 0.01f, saveJumpUpTime = 0.25f;
     [Header("Crash")]
     public bool bCanCrash = true;
     public float maxAliveHeight = 10f, minAliveHeight = -5f, maxRotation = 35f;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        PlayTireEffects(false);
+        SetCarState(ECarState.Idle);
+    }
 
     void Update()
     {
@@ -29,7 +35,6 @@ public class SnCPlayerCarController : SnCCarBehaviour
         CheckSaveAction();
         SetSteeringAngle();
         base.CustomUpdate();
-        CheckPlayerDrift();
         CheckPlayerCrash();
     }
 
@@ -87,8 +92,7 @@ public class SnCPlayerCarController : SnCCarBehaviour
             // start Jump
             _bIsJumping = true;
             _jumpTargetPos = transform.position + transform.TransformDirection(0f, 0.1f, _boxCollider.size.z * _yInput);
-            Debug.DrawRay(_jumpTargetPos, Vector3.up, Color.yellow);
-            Debug.Log("line drawn");
+            SetCarState(ECarState.Jumping);
         }
         StartCoroutine("ResetJump");
     }
@@ -102,38 +106,13 @@ public class SnCPlayerCarController : SnCCarBehaviour
     {
         yield return new WaitForSeconds(saveJumpUpTime);
         _bIsJumping = false;
+        SetCarState(ECarState.Accelerating);
     }
 
     protected new void SetSteeringAngle()
     {
         _steeringAngle = maxSteeringAngle * _xInput * steeringForce;
         frontLeftWheel.steerAngle = frontRightWheel.steerAngle = _steeringAngle;
-    }
-
-    float _preDriftTimer = 0f;
-    void CheckPlayerDrift() 
-    {
-        if (bDriftEnabled)
-        {
-            if (IsAtHighSpeed(10f) && _xInput != 0f && !bIsBouncing)
-            {
-                //Particle Effects
-                PlayTireEffects(true);
-
-                //Drift Behaviour
-                _preDriftTimer += Time.deltaTime;
-                if (_preDriftTimer > preDriftTime && _yInput > 0f)
-                {
-                    Vector3 frontCarPos = transform.TransformPoint(0f, 0f, frontLeftWheel.transform.position.z);
-                    transform.RotateAround(frontCarPos, Vector3.up, driftSpeed * Mathf.Sign(_xInput) * Time.deltaTime);
-                }
-            }
-            else
-            {
-                PlayTireEffects(false);
-                _preDriftTimer = 0f;
-            }
-        }
     }
 
     void CheckPlayerCrash()
@@ -147,20 +126,19 @@ public class SnCPlayerCarController : SnCCarBehaviour
     {
         if (bCanCrash)
         {
-            bCrashed = true;
             sessionManager.EnableInput(false);
             SnCSessionManager.bInputEnabled = false;
             sessionManager.UIRef.SetCountdownUI("Crash!", Color.yellow);
             sessionManager.UIRef.SetRestartText(true);
+            SetCarState(ECarState.Crashed);
         }
     }
 
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Pavement") && !bIsBouncing)
+        if (collision.gameObject.CompareTag("Pavement") && !IsCarState(ECarState.Bouncing))
         {
-            bIsBouncing = true;
             StartCoroutine(ResetBounce());
             BounceBackPlayerCar(collision);
         }
@@ -174,13 +152,12 @@ public class SnCPlayerCarController : SnCCarBehaviour
 
         _rigidbody.AddForce(collision.GetContact(0).normal * bounceRange * currentTorque);
 
-        float rotDirection = 0f;
         if (collisionSide == ECollisionSide.left)
-            rotDirection = 1f;
+            _rotDirection = 1f;
         else if (collisionSide == ECollisionSide.right)
-            rotDirection = -1f;
+            _rotDirection = -1f;
 
-        transform.Rotate(0f, bounceRotSpeed * Time.fixedDeltaTime * rotDirection, 0f);
+        SetCarState(ECarState.Bouncing);
     }
 
     public void ResetPlayerCar()
@@ -188,7 +165,6 @@ public class SnCPlayerCarController : SnCCarBehaviour
         transform.position = _startPos;
         transform.rotation = new Quaternion(_startRot.x, _startRot.y, _startRot.z, 1f);
         GetComponent<Rigidbody>().useGravity = false;
-        bCrashed = false;
-        bIsBouncing = false;
+        SetCarState(ECarState.Idle);
     }
 }

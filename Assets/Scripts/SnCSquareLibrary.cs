@@ -25,6 +25,7 @@ public class SnCSquareLibrary : MonoBehaviour
 
     public void UpdateCurrentLibrary(int newIntensity) 
     {
+        Debug.Log("updated!");
         switch (newIntensity)
         {
             case 0:
